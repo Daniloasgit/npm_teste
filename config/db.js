@@ -3,10 +3,10 @@
 const mysql = require('mysql2') //importando o pacote mysql para conectar ao banco de dados
 
  const db = mysql.createConnection({
-host: process.envDB_HOST,// endereço do servidor de banco de dados
-  user: process.envDB_USER, //nome do usuario para acessar o banco de dados
-  password: process.envDB_PASS, //senha do usuario para acessar o banco de dados
-  database: process.envDB_NAME, //Nome do banco de dados
+host:process.env.DB_HOST,// endereço do servidor de banco de dados
+  user:process.env.DB_USER, //nome do usuario para acessar o banco de dados
+  password:process.env.DB_PASS, //senha do usuario para acessar o banco de dados
+  database:process.env.DB_NAME, //Nome do banco de dados
 
 });
 
