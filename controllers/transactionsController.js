@@ -41,8 +41,8 @@ const updateTransactionPut = (req, res) => {
         [date, amount, description, category, account, user_id, id],
     (err, results) => {
         if(err) {
-          console.error('erro ao adicionar trasação',err);
-            res.status(500).send('erro ao adicionar transação');
+          console.error('erro ao atualizar trasação',err);
+            res.status(500).send('erro ao atualizar transação');
             return;
         
        }
@@ -56,31 +56,55 @@ const updateTransactionPut = (req, res) => {
 // função para atualizar uma transação existente (substituição parcial)
 const updateTransactionPatch = (req, res) => {
     const {id} = req.params;
-    const updates = {};
+    const fields = req.body;
+    const query = [];
+    const values = [];
 
-    for(let key in req.body) {
-        if(req.body[key]!== undefined) {
-            updates[key] = req.body[key];
-        }
+   for (const[key,value] of Object.entries(fields)) {
+    query.push( `${key}= ?`);
+    values.push(value);
+
+   }
+
+   values.push(id);
+
+db.query(
+    `update transactions SET ${query.join(',')} where id = ?`,
+    values,
+    (err, results) => {
+        if(err) {
+          console.error('erro ao atualizar trasação',err);
+            res.status(500).send('erro ao atualizar transação');
+            return;
+        
+       }
+       res.send('transação atualizada com sucesso');
     }
 
-    db.query(
-        'update transactions SET? where id =?',
-        [updates, id],
-        (err, results) => {
-            if(err) {
-                console.error('Erro ao atualizar transação',err);
-                res.status(500).send('Erro ao atualizar transação');
-                return;
-            }
-            res.send('transação atualizada com sucesso');
-        }
-    );
+);
 };
+
+// função para deletar uma transação
+const deleteTransaction = (req, res) =>{
+    const {id} = req.params;
+db.query('delete from transactions where id = ?',[id],
+    (err, results) => {
+        if(err) {
+          console.error('erro ao deletar trasação',err);
+            res.status(500).send('erro ao deletar transação');
+            return;
+        
+       }
+       res.send('transação deletada com sucesso');
+    }
+
+);
+}
 
 module.exports = {
     getALLTransactions,
     addTransactions,
-    updateTransactionPut
-    updateTransactionPatch
+    updateTransactionPut,
+    updateTransactionPatch,
+    deleteTransaction 
 };
