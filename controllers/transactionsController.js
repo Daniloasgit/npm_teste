@@ -15,22 +15,43 @@ const getALLTransactions = (req,res) => {
 };
 
 // função para adicionar uma nova transação
+// com verificação de duplicidade
 const addTransactions = (req, res) => {
     const { date, amount, description, category, account, user_id } = req.body;
 
-    db.query(
-        'INSERT INTO transactions (date, amount, description, category, account, user_id) VALUES (?, ?, ?, ?, ?, ?)',
-        [date, amount, description, category, account, user_id],
-        (err, results) => {
-            if (err) {
-                console.error('Erro ao adicionar transação', err);
-                res.status(500).send('Erro ao adicionar transação');
+    // verificar se duplicidade já existe
+db.query(
+    'SELECT * FROM transactions WHERE date=? AND amount=? AND description=? AND category=? AND account=? AND user_id=?',
+    [date, amount, description, category, account, user_id],
+    (err, results) => {
+         if (err) {
+            console.error('Erro ao verificar transação', err);
+            res.status(500).send('Erro ao verificar transação');
+            return;
+            }
+        if (results.length > 0) {
+                // se existir duplicidade
+                res.status(400).send('Transação já existente');
                 return;
             }
-            res.status(201).send('Transação adicionada com sucesso');
+
+            // se não haver duplicidade, então adicionar ao banco de dados
+db.query(
+    'INSERT INTO transactions (date, amount, description, category, account, user_id) VALUES (?, ?, ?, ?, ?, ?)',
+    [date, amount, description, category, account, user_id],
+    (err, results) => {
+        if (err) {
+        console.error('Erro ao adicionar transação', err);
+        res.status(500).send('Erro ao adicionar transação');
+        return;
         }
-    );
+            res.status(201).send('Transação adicionada com sucesso');
+         }
+     );
+    }
+);
 };
+
 
 //função para atualizar uma transação existente (substituição completa)
 const updateTransactionPut = (req, res) => {
