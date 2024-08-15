@@ -65,8 +65,14 @@ const updateTransactionPut = (req, res) => {
           console.error('erro ao atualizar trasação',err);
             res.status(500).send('erro ao atualizar transação');
             return;
-        
        }
+
+       //verificar se nenhuma linha foi afetafa pela consulta
+       if(results.affectedRows===0) {
+        res.status(404).send('Transação não encontrada');
+        return;
+       }
+
        res.send('transação atualizada com sucesso');
     }
 );
@@ -97,8 +103,13 @@ db.query(
           console.error('erro ao atualizar trasação',err);
             res.status(500).send('erro ao atualizar transação');
             return;
-        
        }
+
+       if(results.affectedRows===0) {
+        res.status(404).send('Transação não encontrada');
+        return;
+       }
+       
        res.send('transação atualizada com sucesso');
     }
 
@@ -114,7 +125,11 @@ db.query('delete from transactions where id = ?',[id],
           console.error('erro ao deletar trasação',err);
             res.status(500).send('erro ao deletar transação');
             return;
-        
+       }
+
+       if(results.affectedRows===0) {
+        res.status(404).send('Transação não encontrada');
+        return;
        }
        res.send('transação deletada com sucesso');
     }
